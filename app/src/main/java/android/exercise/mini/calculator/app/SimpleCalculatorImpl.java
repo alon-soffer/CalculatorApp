@@ -46,7 +46,6 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
 
     private String calculate()
     {
-        System.out.println("calculating");
         String operation = "+";
         int res = 0;    //TODO: is int enough?
         CalculatorTokenizer tokenizer = new CalculatorTokenizer(inputs, SimpleCalculatorImpl.operations);
@@ -72,10 +71,9 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
             }
             token = tokenizer.getToken();
         }
-        clear();
-        inputs.add(Integer.toString(res));
+//        clear();
+//        inputs.add(Integer.toString(res));
         last_val = res;
-        System.out.println("returning: " + Integer.toString(res));
         return Integer.toString(res);
     }
 
@@ -84,28 +82,43 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
     {
         // todo: return output based on the current state
 //        TODO: starts with 0. after answering save last answer as begin output
-        if (equals)
+//        if (equals)
+//        {
+//            System.out.println("printing equals to view");
+//            equals = false;
+//            return calculate();
+//        }
+//        else
+//        {
+//            if (inputs.isEmpty())
+//            {
+//                return Integer.toString(last_val);
+//            }
+//
+//            StringBuilder out_p = new StringBuilder();
+//            for (String s: inputs)
+//            {
+//                out_p.append(s);
+//            }
+//            return out_p.toString();
+//        }
+        if (inputs.isEmpty())
         {
-            System.out.println("printing equals to view");
-            equals = false;
-            return calculate();
+            return Integer.toString(last_val);
         }
-        else
-        {
-            if (inputs.isEmpty())
-            {
-                return Integer.toString(last_val);
-            }
 
-            StringBuilder out_p = new StringBuilder();
-            for (String s: inputs)
-            {
-                out_p.append(s);
-            }
-            return out_p.toString();
+        StringBuilder out_p = new StringBuilder();
+        for (String s: inputs)
+        {
+            out_p.append(s);
         }
+        return out_p.toString();
     }
 
+    /***
+     * adds toInsert to the input
+     * @param toInsert String to add to input
+     */
     private void insert_something(String toInsert)
     {
         inputs.add(toInsert);
@@ -122,6 +135,10 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         insert_something(Integer.toString(digit));
     }
 
+    /***
+     * method for inserting both + and -
+     * @param op String of either + or -
+     */
     private void insertOperation(String op)
     {
 //        if last input was operation, do nothing
@@ -129,7 +146,6 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
                 SimpleCalculatorImpl.operations.contains(inputs.get(inputs.size()-1)))
         {
             return;
-//            this.deleteLast();
         }
         if (inputs.size() == 0)
         {
@@ -137,6 +153,7 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         }
         insert_something(op);
     }
+
     @Override
     public void insertPlus() {
         // todo: insert a plus
@@ -151,6 +168,15 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         insertOperation("-");
     }
 
+    private void addResult(String res)
+    {
+//        for (String s : res)
+        for (int i=0; i<res.length(); i++)
+        {
+            inputs.add(String.valueOf(res.charAt(i)));
+        }
+    }
+
     @Override
     public void insertEquals()
     {
@@ -163,8 +189,12 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
             deleteLast();
         }
         insert_something("=");
-        equals = true;
-//        System.out.println("equals pressed");
+        String res = calculate();
+        inputs.clear();
+//        inputs.add(res);
+        addResult(res);
+        last_val = Integer.parseInt(res);
+//        equals = true;
     }
 
     @Override
@@ -179,6 +209,10 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         if (inputs.size() != 0)
         {
             inputs.remove(inputs.size()-1);
+            if (inputs.size() == 0)
+            {
+                last_val = 0;
+            }
         }
     }
 
@@ -226,7 +260,6 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
      */
         private ArrayList<String> inputs;
         private boolean equals;
-//        private static HashSet<String> operations;
         private int last_val;
     }
 }

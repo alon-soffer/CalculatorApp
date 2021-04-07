@@ -122,5 +122,224 @@ public class SimpleCalculatorImplTest {
     //  - with 2 calculators, give them different inputs, then save state on first calculator and load the state into second calculator, make sure state loaded well
     //  etc etc.
     //  feel free to be creative in your tests!
+    @Test
+    public void when_deletingMiddleOfInput_then_outputShouldBeCorrect()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertMinus();
+        calculatorUnderTest.insertDigit(1);
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.deleteLast();
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertDigit(5);
 
+        assertEquals("5+7-125", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_deletingEmptyOutput_then_noExceptionAndOutputShouldBeZero()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.deleteLast();
+
+        assertEquals("0", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_usingClearAndContinuingToInsert_then_outputShouldBeCorrect()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.clear();
+        calculatorUnderTest.insertDigit(1);
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.clear();
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertEquals();
+
+        assertEquals("7", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_continuingCalculationAfterEquals_then_outputShouldBeCorrect()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertEquals();
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(1);
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.insertEquals();
+        calculatorUnderTest.insertMinus();
+        calculatorUnderTest.insertDigit(5);
+
+        assertEquals("25-5", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_longCalculation_then_outputShouldBeCorrect()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertMinus();
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertEquals();
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(1);
+        calculatorUnderTest.insertDigit(3);
+
+
+        assertEquals("1110+13", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_savingStateFromFirstCalculator_should_loadStateCorrectlyFromSecondCalculatorEvenIfSecondHasInput(){
+        SimpleCalculatorImpl firstCalculator = new SimpleCalculatorImpl();
+        SimpleCalculatorImpl secondCalculator = new SimpleCalculatorImpl();
+        // TODO: implement the test based on this method's name.
+        //  you can get inspiration from the test method `when_savingState_should_loadThatStateCorrectly()`
+        firstCalculator.insertDigit(1);
+        firstCalculator.insertDigit(4);
+        firstCalculator.insertPlus();
+        firstCalculator.insertDigit(5);
+        firstCalculator.insertMinus();
+        firstCalculator.insertDigit(3);
+        firstCalculator.insertPlus();
+        Serializable savedState = firstCalculator.saveState();
+        assertNotNull(savedState);
+
+        assertEquals("0", secondCalculator.output());
+
+        secondCalculator.insertDigit(5);
+        secondCalculator.insertPlus();
+        secondCalculator.insertDigit(3);
+
+        secondCalculator.loadState(savedState);
+        assertEquals("14+5-3+", secondCalculator.output());
+    }
+
+    @Test
+    public void when_equalsNotYetInserted_then_outputShouldBeCorrect()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(1);
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.insertMinus();
+
+        assertEquals("5+7+13-", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_orderComesAfterOrder_then_lastOrderShouldBeIgnored()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertMinus();
+        calculatorUnderTest.insertDigit(7);
+
+        assertEquals("5+7", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_deletingAllInput_then_outputZero()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.deleteLast();
+        calculatorUnderTest.deleteLast();
+        calculatorUnderTest.deleteLast();
+
+        assertEquals("0", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_deletingMoreTimesThenInput_then_noExceptionThrow()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.deleteLast();
+        calculatorUnderTest.deleteLast();
+        calculatorUnderTest.deleteLast();
+
+        assertEquals("0", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_saveStateWithLongInput_then_loadingStateShouldHaveCorrectInput()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(7);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(2);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(1);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(3);
+        calculatorUnderTest.insertPlus();
+
+        Serializable state = calculatorUnderTest.saveState();
+        calculatorUnderTest.clear();
+        assertEquals("0", calculatorUnderTest.output());
+
+        calculatorUnderTest.loadState(state);
+        assertEquals("5+5+5+7+7+7+2+2+2+1+3+3+3+", calculatorUnderTest.output());
+    }
+
+    @Test
+    public void when_deletingAfterEquals_then_deleteLastDig()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertPlus();
+        calculatorUnderTest.insertDigit(5);
+        calculatorUnderTest.insertEquals();
+
+        assertEquals("10", calculatorUnderTest.output());
+
+        calculatorUnderTest.deleteLast();
+        assertEquals("1", calculatorUnderTest.output());
+    }
 }
