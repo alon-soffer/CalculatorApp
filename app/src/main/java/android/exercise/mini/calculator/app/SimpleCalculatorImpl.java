@@ -41,13 +41,15 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
     private ArrayList<String> inputs = new ArrayList<String>();
     private boolean equals = false;
     private static final HashSet<String> operations = new HashSet<String>(Arrays.asList("+","-","="));
+    private int last_val = 0;
+
 
     private String calculate()
     {
         System.out.println("calculating");
         String operation = "+";
         int res = 0;    //TODO: is int enough?
-        CalculatorTokenizer tokenizer = new CalculatorTokenizer(this.inputs, SimpleCalculatorImpl.operations);
+        CalculatorTokenizer tokenizer = new CalculatorTokenizer(inputs, SimpleCalculatorImpl.operations);
         String token = tokenizer.getToken();
         while (!token.equals("="))
         {
@@ -70,7 +72,9 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
             }
             token = tokenizer.getToken();
         }
-        this.clear();
+        clear();
+        inputs.add(Integer.toString(res));
+        last_val = res;
         System.out.println("returning: " + Integer.toString(res));
         return Integer.toString(res);
     }
@@ -79,16 +83,22 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
     public String output()
     {
         // todo: return output based on the current state
-        if (this.equals)
+//        TODO: starts with 0. after answering save last answer as begin output
+        if (equals)
         {
             System.out.println("printing equals to view");
-            this.equals = false;
-            return this.calculate();
+            equals = false;
+            return calculate();
         }
         else
         {
+            if (inputs.isEmpty())
+            {
+                return Integer.toString(last_val);
+            }
+
             StringBuilder out_p = new StringBuilder();
-            for (String s: this.inputs)
+            for (String s: inputs)
             {
                 out_p.append(s);
             }
@@ -98,36 +108,47 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
 
     private void insert_something(String toInsert)
     {
-        this.inputs.add(toInsert);
+        inputs.add(toInsert);
     }
 
     @Override
     public void insertDigit(int digit) {
         // todo: insert a digit
-//    this.inputs.add(Integer.toString(digit));
-        this.insert_something(Integer.toString(digit));
+        if (digit < 0 || digit > 9)
+        {
+            throw new IllegalArgumentException();
+        }
+
+        insert_something(Integer.toString(digit));
     }
 
     private void insertOperation(String op)
     {
-        if (this.inputs.size() > 0 && SimpleCalculatorImpl.operations.contains(this.inputs.get(this.inputs.size()-1)))
+//        if last input was operation, do nothing
+        if (inputs.size() > 0 &&
+                SimpleCalculatorImpl.operations.contains(inputs.get(inputs.size()-1)))
         {
-            this.deleteLast();
+            return;
+//            this.deleteLast();
         }
-        this.insert_something(op);
+        if (inputs.size() == 0)
+        {
+            inputs.add("0");
+        }
+        insert_something(op);
     }
     @Override
     public void insertPlus() {
         // todo: insert a plus
 //        this.insert_something("+");
-        this.insertOperation("+");
+        insertOperation("+");
     }
 
     @Override
     public void insertMinus() {
         // todo: insert a minus
 //        this.insert_something("-");
-        this.insertOperation("-");
+        insertOperation("-");
     }
 
     @Override
@@ -136,10 +157,14 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         // todo: calculate the equation. after calling `insertEquals()`, the output should be the result
         //  e.g. given input "14+3", calling `insertEquals()`, and calling `output()`, output should be "17"
 
-//        TODO: what happens if last input is operation (+/-)?
+        // if last input was operation, we want to ignore it
+        if (SimpleCalculatorImpl.operations.contains(inputs.get(inputs.size()-1)))
+        {
+            deleteLast();
+        }
         insert_something("=");
         equals = true;
-        System.out.println("equals pressed");
+//        System.out.println("equals pressed");
     }
 
     @Override
@@ -150,19 +175,31 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         //  if input was "12+3" and called `deleteLast()`, then delete the "3"
         //  if input was "12+" and called `deleteLast()`, then delete the "+"
         //  if no input was given, then there is nothing to do here
-        inputs.remove(inputs.size()-1);
+
+        if (inputs.size() != 0)
+        {
+            inputs.remove(inputs.size()-1);
+        }
     }
 
     @Override
     public void clear() {
         // todo: clear everything (same as no-input was never given)
-        inputs = new ArrayList<String>();
+        inputs.clear();
+        last_val = 0;
     }
 
     @Override
     public Serializable saveState() {
         CalculatorState state = new CalculatorState();
         // todo: insert all data to the state, so in the future we can load from this state
+        state.inputs = new ArrayList<>();
+        for (String i: this.inputs)
+        {
+            state.inputs.add(i);
+        }
+        state.equals = this.equals;
+        state.last_val = this.last_val;
         return state;
     }
 
@@ -173,6 +210,9 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         }
         CalculatorState casted = (CalculatorState) prevState;
         // todo: use the CalculatorState to load
+        this.inputs = casted.inputs;
+        this.equals = casted.equals;
+        this.last_val = casted.last_val;
     }
 
     private static class CalculatorState implements Serializable {
@@ -184,5 +224,9 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
     - ArrayList<> where the type is a primitive or a String
     - HashMap<> where the types are primitives or a String
      */
+        private ArrayList<String> inputs;
+        private boolean equals;
+//        private static HashSet<String> operations;
+        private int last_val;
     }
 }
