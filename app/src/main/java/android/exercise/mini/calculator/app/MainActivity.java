@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         TextView button1 = findViewById(R.id.button1);
         TextView button4 = findViewById(R.id.button4);
         TextView button7 = findViewById(R.id.button7);
-        ImageView buttonBackSpace = findViewById(R.id.backSpaceImage);
+        View buttonBackSpace = findViewById(R.id.buttonBackSpace);
         TextView button3 = findViewById(R.id.button3);
         TextView button6 = findViewById(R.id.button6);
         TextView button9 = findViewById(R.id.button9);
@@ -84,14 +85,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState)
+    {
         super.onSaveInstanceState(outState);
         // todo: save calculator state into the bundle
+        outState.putSerializable("calculator_saved_state", calculator.saveState());
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         // todo: restore calculator state from the bundle, refresh main text-view from calculator's output
+        calculator.loadState(savedInstanceState.getSerializable("calculator_saved_state"));
+        TextView calcOutput = findViewById(R.id.textViewCalculatorOutput);
+        calcOutput.setText(calculator.output());
     }
 }

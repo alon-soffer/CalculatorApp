@@ -342,4 +342,12 @@ public class SimpleCalculatorImplTest {
         calculatorUnderTest.deleteLast();
         assertEquals("1", calculatorUnderTest.output());
     }
+
+    @Test
+    public void when_pressingEqualsOnEmptyInput_then_output0()
+    {
+        SimpleCalculatorImpl calculatorUnderTest = new SimpleCalculatorImpl();
+        calculatorUnderTest.insertEquals();
+        assertEquals("0", calculatorUnderTest.output());
+    }
 }

@@ -47,7 +47,7 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
     private String calculate()
     {
         String operation = "+";
-        int res = 0;    //TODO: is int enough?
+        int res = 0;
         CalculatorTokenizer tokenizer = new CalculatorTokenizer(inputs, SimpleCalculatorImpl.operations);
         String token = tokenizer.getToken();
         while (!token.equals("="))
@@ -184,6 +184,10 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         //  e.g. given input "14+3", calling `insertEquals()`, and calling `output()`, output should be "17"
 
         // if last input was operation, we want to ignore it
+        if (inputs.size() == 0)
+        {
+            return;
+        }
         if (SimpleCalculatorImpl.operations.contains(inputs.get(inputs.size()-1)))
         {
             deleteLast();
@@ -205,7 +209,6 @@ public class SimpleCalculatorImpl implements SimpleCalculator {
         //  if input was "12+3" and called `deleteLast()`, then delete the "3"
         //  if input was "12+" and called `deleteLast()`, then delete the "+"
         //  if no input was given, then there is nothing to do here
-
         if (inputs.size() != 0)
         {
             inputs.remove(inputs.size()-1);
